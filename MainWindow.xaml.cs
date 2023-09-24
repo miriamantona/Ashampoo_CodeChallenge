@@ -14,12 +14,11 @@ namespace CodeChallengeApp
   {
     private List<string> processedDirectories;
     private List<DirectoryResult> results = new List<DirectoryResult>();
-    private int totalDirectoriesToProcess;
-    private int processedDirectoriesCount;
+    private int totalToProcess;
+    private int totalTopDirectoriesProcessed;
     private string selectedDrive;
     private CancellationTokenSource cancellationTokenSource;
     private bool isPaused = false;
-
 
     public MainWindow()
     {
@@ -27,12 +26,6 @@ namespace CodeChallengeApp
       progressBar.Visibility = Visibility.Hidden;
       textNoFiles.Visibility = Visibility.Hidden;
       cancellationTokenSource = new CancellationTokenSource();
-    }
-
-    public class DriveInformation
-    {
-      public string DriveLetter { get; set; }
-      public string VolumeLabel { get; set; }
     }
 
     // Event handlers
@@ -44,14 +37,16 @@ namespace CodeChallengeApp
       dataGridResults.Items.Clear();
       progressBar.Visibility = Visibility.Visible;
       buttonPauseResume.IsEnabled = true;
+      buttonSearch.IsEnabled = false;
       await StartSearchAsync(dialog.SelectedPath);
+      buttonSearch.IsEnabled = true;
     }
 
     private async void ButtonPauseResume_Click(object sender, RoutedEventArgs e)
     {
       if (isPaused) //Click Resume
       {
-        UpdateProgressBar(); // Actualizar el progreso
+        UpdateProgressBar();
         buttonPauseResume.Content = "Pause";
         isPaused = false;
         cancellationTokenSource = new CancellationTokenSource();
@@ -68,9 +63,10 @@ namespace CodeChallengeApp
 
     public async Task StartSearchAsync(string selectedDrive)
     {
+      processedDirectories = new List<string>();
       cancellationTokenSource = new CancellationTokenSource();
       CancellationToken cancellationToken = cancellationTokenSource.Token;
-      totalDirectoriesToProcess = GetDirectoriesToProcess(selectedDrive);
+      totalToProcess = GetCountToProcess(selectedDrive);
       textNoFiles.Visibility = Visibility.Hidden;
       progressBar.Value = 0;
 
@@ -88,14 +84,14 @@ namespace CodeChallengeApp
           }
           else
           {
-            UpdateView(results);
+            //UpdateView(results);
           }
         }
 
         results = SearchInDirectoryAsync(selectedDrive, cancellationToken).Result;
         if (!cancellationToken.IsCancellationRequested)
         {
-          UpdateView(results);
+          FinishProgressBar();
         }
       });
 
@@ -109,8 +105,6 @@ namespace CodeChallengeApp
     public async Task<List<DirectoryResult>> SearchInDirectoryAsync(string directoryPath, CancellationToken cancellationToken)
     {
       List<DirectoryResult> results = new List<DirectoryResult>();
-      processedDirectories = new List<string>();
-
       try
       {
         foreach (FileInfo file in new DirectoryInfo(directoryPath).GetFiles("*.*", SearchOption.TopDirectoryOnly))
@@ -127,6 +121,11 @@ namespace CodeChallengeApp
                 TotalSizeBytes = GetTotalSizeBytes(directoryPath)
               });
               processedDirectories.Add(directoryPath);
+              if (Directory.GetParent(directoryPath).ToString() == selectedDrive)
+              {
+                totalTopDirectoriesProcessed++;
+              }
+              UpdateView(results);
             }
           }
         }
@@ -164,9 +163,8 @@ namespace CodeChallengeApp
             dataGridResults.Items.Add(result);
           }
         });
+        UpdateProgressBar();
       }
-      processedDirectoriesCount++;
-      UpdateProgressBar();
     }
 
     private int GetFileCount(string directory)
@@ -198,24 +196,29 @@ namespace CodeChallengeApp
       return totalSizeBytes;
     }
 
-    private int GetDirectoriesToProcess(string selectedDrive)
+    private int GetCountToProcess(string selectedDrive)
     {
-      if (!Directory.EnumerateDirectories(selectedDrive).Any())
-      {
-        return Directory.EnumerateFiles(selectedDrive).Count();
-      }
-      return Directory.EnumerateDirectories(selectedDrive).Count();
+      if (!Directory.GetDirectories(selectedDrive, "*", SearchOption.TopDirectoryOnly).Any())
+        return Directory.GetFiles(selectedDrive).Count();
+
+      return Directory.GetDirectories(selectedDrive, "*", SearchOption.TopDirectoryOnly).Count();
     }
 
     private void UpdateProgressBar()
     {
       Dispatcher.Invoke(() =>
       {
-        double progressPercentage = ((double)processedDirectoriesCount / totalDirectoriesToProcess) * 100;
+        double progressPercentage = (double)totalTopDirectoriesProcessed / totalToProcess * 100;
         progressBar.Value = progressPercentage;
       });
     }
 
-
+    private void FinishProgressBar()
+    {
+      Dispatcher.Invoke(() =>
+      {
+        progressBar.Value = 100;
+      });
+    }
   }
 }
