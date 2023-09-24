@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Threading;
 
 namespace CodeChallengeApp
 {
@@ -14,19 +15,18 @@ namespace CodeChallengeApp
   {
     private List<string> processedDirectories;
     private List<DirectoryResult> results = new List<DirectoryResult>();
-    private int totalToProcess;
-    private int totalTopDirectoriesProcessed;
-    private string selectedDrive;
     private CancellationTokenSource cancellationTokenSource;
     private bool isPaused = false;
-    Queue<string> queueDirectories = new Queue<string>();
+    private Queue<string> queueDirectories = new Queue<string>();
+    private DispatcherTimer blinkingTimer;
+    private CancellationToken cancellationToken;
 
     public MainWindow()
     {
       InitializeComponent();
-      progressBar.Visibility = Visibility.Hidden;
+      textBoxSearching.Visibility = Visibility.Hidden;
       textNoFiles.Visibility = Visibility.Hidden;
-      cancellationTokenSource = new CancellationTokenSource();
+      cancellationTokenSource = new CancellationTokenSource();     
     }
 
     // Event handlers
@@ -34,30 +34,35 @@ namespace CodeChallengeApp
     {
       var dialog = new FolderBrowserDialog();
       dialog.ShowDialog();
-      selectedDrive = textBoxFolder.Text = dialog.SelectedPath;
+      textBoxFolder.Text = dialog.SelectedPath;
       dataGridResults.Items.Clear();
-      progressBar.Visibility = Visibility.Visible;
       buttonPauseResume.IsEnabled = true;
       buttonSearch.IsEnabled = false;
-      totalToProcess = GetCountToProcess(selectedDrive);
+      InitializeSearchingMessage();
 
       await StartSearchAsync(dialog.SelectedPath);
-      buttonSearch.IsEnabled = true;
+
+      if (!cancellationToken.IsCancellationRequested)
+      {
+        buttonSearch.IsEnabled = true;
+        ShowCompletedSearchMessage();       
+      }
     }
 
     private async void ButtonPauseResume_Click(object sender, RoutedEventArgs e)
     {
       if (isPaused) //Click Resume
       {
-        //UpdateProgressBar();
         buttonPauseResume.Content = "Pause";
         isPaused = false;
+        InitializeSearchingMessage();
         cancellationTokenSource = new CancellationTokenSource();
         await StartSearchAsync(queueDirectories.Dequeue());
       }
       else // Click pause
       {
         buttonPauseResume.Content = "Resume";
+        StopBlinkingTimer();
         cancellationTokenSource?.Cancel();
         isPaused = true;
         await Task.Delay(100); // Permitir que se procese la cancelación        
@@ -71,9 +76,8 @@ namespace CodeChallengeApp
 
       processedDirectories = new List<string>();
       cancellationTokenSource = new CancellationTokenSource();
-      CancellationToken cancellationToken = cancellationTokenSource.Token;     
+      cancellationToken = cancellationTokenSource.Token;
       textNoFiles.Visibility = Visibility.Hidden;
-      progressBar.Value = 0;
 
       List<DirectoryResult> results = new List<DirectoryResult>();
 
@@ -95,11 +99,6 @@ namespace CodeChallengeApp
 
             await SearchInDirectoryAsync(currentDirectory, cancellationToken);
 
-            if (Directory.GetParent(currentDirectory).ToString() == selectedDrive)
-            {
-              totalTopDirectoriesProcessed++;
-            }
-
             string[] subDirectories = Directory.GetDirectories(currentDirectory);
             foreach (string subDirectory in subDirectories)
             {
@@ -112,14 +111,9 @@ namespace CodeChallengeApp
           }
         }
       });
-      if (!cancellationToken.IsCancellationRequested)
-      {
-        FinishProgressBar();
-      }
       if (dataGridResults.Items.IsEmpty)
       {
         textNoFiles.Visibility = Visibility.Visible;
-        progressBar.Value = 100;
       }
     }
 
@@ -145,8 +139,8 @@ namespace CodeChallengeApp
                 TotalSizeMB = GetTotalSizeMB(directoryPath),
                 TotalSizeBytes = GetTotalSizeBytes(directoryPath)
               });
-              processedDirectories.Add(directoryPath);             
-              UpdateView(results);
+              processedDirectories.Add(directoryPath);
+              UpdateGrid(results);
             }
           }
         }
@@ -159,7 +153,7 @@ namespace CodeChallengeApp
       return results;
     }
 
-    private void UpdateView(List<DirectoryResult> results)
+    private void UpdateGrid(List<DirectoryResult> results)
     {
       if (results.Any())
       {
@@ -170,7 +164,6 @@ namespace CodeChallengeApp
             dataGridResults.Items.Add(result);
           }
         });
-        UpdateProgressBar();
       }
     }
 
@@ -203,29 +196,44 @@ namespace CodeChallengeApp
       return totalSizeBytes;
     }
 
-    private int GetCountToProcess(string selectedDrive)
+    private void InitializeSearchingMessage()
     {
-      if (!Directory.GetDirectories(selectedDrive, "*", SearchOption.TopDirectoryOnly).Any())
-        return Directory.GetFiles(selectedDrive).Count();
-
-      return Directory.GetDirectories(selectedDrive, "*", SearchOption.TopDirectoryOnly).Count() + 1; //Sum root directory.
+      textBoxSearching.Text = "Searching...";
+      textBoxSearching.Visibility = Visibility.Visible;
+      blinkingTimer = new DispatcherTimer();
+      blinkingTimer.Tick += BlinkingTimer_Tick;
+      blinkingTimer.Interval = TimeSpan.FromMilliseconds(500); // Cambia la velocidad de parpadeo según sea necesario
+      blinkingTimer.Start();
     }
 
-    private void UpdateProgressBar()
+    private void BlinkingTimer_Tick(object sender, EventArgs e)
     {
-      
-      Dispatcher.Invoke(() =>
+      if (textBoxSearching.Visibility == Visibility.Visible)
       {
-        progressBar.Value = (double)totalTopDirectoriesProcessed / totalToProcess * 100;
-      });
+        textBoxSearching.Visibility = Visibility.Hidden;
+      }
+      else
+      {
+        textBoxSearching.Visibility = Visibility.Visible;
+      }
     }
 
-    private void FinishProgressBar()
+    private void StopBlinkingTimer()
     {
-      Dispatcher.Invoke(() =>
+      if (blinkingTimer != null)
       {
-        progressBar.Value = 100;
-      });
+        blinkingTimer.Stop();
+        blinkingTimer.Tick -= BlinkingTimer_Tick;
+        blinkingTimer = null;
+        textBoxSearching.Visibility = Visibility.Hidden;
+      }
+    }
+
+    private void ShowCompletedSearchMessage()
+    {
+      StopBlinkingTimer();
+      textBoxSearching.Text = "Search Completed";
+      textBoxSearching.Visibility = Visibility.Visible;
     }
   }
 }
