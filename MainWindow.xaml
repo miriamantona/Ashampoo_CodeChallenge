@@ -12,8 +12,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Directory" Width="*" Binding="{Binding DirectoryPath}" />
                 <DataGridTextColumn Header="Count of files" Width="*" Binding="{Binding FileCount}" />
-                <DataGridTextColumn Header="Total size (MB)" Width="*" Binding="{Binding TotalSizeMB}" />
-                <DataGridTextColumn Header="Total size (Bytes)" Width="*" Binding="{Binding TotalSizeBytes}" />
+                <DataGridTextColumn Header="Total size (MB)" Width="*" Binding="{Binding TotalSizeMB}" />              
             </DataGrid.Columns>
         </DataGrid>
         <TextBlock x:Name="textNoFiles" Text="No results" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>

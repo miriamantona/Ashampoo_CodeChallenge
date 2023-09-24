@@ -136,8 +136,7 @@ namespace CodeChallengeApp
               {
                 DirectoryPath = directoryPath,
                 FileCount = GetFileCount(directoryPath),
-                TotalSizeMB = GetTotalSizeMB(directoryPath),
-                TotalSizeBytes = GetTotalSizeBytes(directoryPath)
+                TotalSizeMB = GetTotalSizeMB(directoryPath)
               });
               processedDirectories.Add(directoryPath);
               UpdateGrid(results);
@@ -174,26 +173,14 @@ namespace CodeChallengeApp
 
     private double GetTotalSizeMB(string directory)
     {
-      double totalSizeBytes = 0;
+      double totalSize = 0;
 
       foreach (string file in Directory.GetFiles(directory))
       {
-        totalSizeBytes += new FileInfo(file).Length;
+        totalSize += new FileInfo(file).Length;
       }
 
-      return (totalSizeBytes / (1024 * 1024));
-    }
-
-    private long GetTotalSizeBytes(string directory)
-    {
-      long totalSizeBytes = 0;
-
-      foreach (string file in Directory.GetFiles(directory))
-      {
-        totalSizeBytes += new FileInfo(file).Length;
-      }
-
-      return totalSizeBytes;
+      return (totalSize / (1024 * 1024));
     }
 
     private void InitializeSearchingMessage()
