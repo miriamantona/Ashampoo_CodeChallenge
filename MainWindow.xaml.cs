@@ -107,8 +107,12 @@ namespace CodeChallengeApp
       List<DirectoryResult> results = new List<DirectoryResult>();
       try
       {
+        cancellationToken.ThrowIfCancellationRequested();
+
         foreach (FileInfo file in new DirectoryInfo(directoryPath).GetFiles("*.*", SearchOption.TopDirectoryOnly))
         {
+          cancellationToken.ThrowIfCancellationRequested();
+
           if (!processedDirectories.Contains(directoryPath))
           {
             if (file.Length > 10 * 1024 * 1024) // Verifica si el archivo es mayor a 10 MB
