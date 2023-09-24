@@ -19,6 +19,7 @@ namespace CodeChallengeApp
     private string selectedDrive;
     private CancellationTokenSource cancellationTokenSource;
     private bool isPaused = false;
+    Queue<string> queueDirectories = new Queue<string>();
 
     public MainWindow()
     {
@@ -38,6 +39,8 @@ namespace CodeChallengeApp
       progressBar.Visibility = Visibility.Visible;
       buttonPauseResume.IsEnabled = true;
       buttonSearch.IsEnabled = false;
+      totalToProcess = GetCountToProcess(selectedDrive);
+
       await StartSearchAsync(dialog.SelectedPath);
       buttonSearch.IsEnabled = true;
     }
@@ -46,11 +49,11 @@ namespace CodeChallengeApp
     {
       if (isPaused) //Click Resume
       {
-        UpdateProgressBar();
+        //UpdateProgressBar();
         buttonPauseResume.Content = "Pause";
         isPaused = false;
         cancellationTokenSource = new CancellationTokenSource();
-        await StartSearchAsync(selectedDrive);
+        await StartSearchAsync(queueDirectories.Dequeue());
       }
       else // Click pause
       {
@@ -63,38 +66,56 @@ namespace CodeChallengeApp
 
     public async Task StartSearchAsync(string selectedDrive)
     {
+      if (String.IsNullOrEmpty(selectedDrive))
+        return;
+
       processedDirectories = new List<string>();
       cancellationTokenSource = new CancellationTokenSource();
-      CancellationToken cancellationToken = cancellationTokenSource.Token;
-      totalToProcess = GetCountToProcess(selectedDrive);
+      CancellationToken cancellationToken = cancellationTokenSource.Token;     
       textNoFiles.Visibility = Visibility.Hidden;
       progressBar.Value = 0;
 
       List<DirectoryResult> results = new List<DirectoryResult>();
 
-      await Task.Run(() =>
+      queueDirectories.Enqueue(selectedDrive);
+      List<Task> tasks = new List<Task>();
+
+      await Task.Run(async() =>
       {
-        foreach (string subDir in Directory.EnumerateDirectories(selectedDrive))
+        while (queueDirectories.Count > 0)
         {
-          results = SearchInDirectoryAsync(subDir, cancellationToken).Result;
+          string currentDirectory = queueDirectories.Dequeue();         
 
-          if (cancellationToken.IsCancellationRequested)
+          try
           {
-            break;
-          }
-          else
-          {
-            //UpdateView(results);
-          }
-        }
+            if (cancellationToken.IsCancellationRequested)
+            {
+              break;
+            }
 
-        results = SearchInDirectoryAsync(selectedDrive, cancellationToken).Result;
-        if (!cancellationToken.IsCancellationRequested)
-        {
-          FinishProgressBar();
+            await SearchInDirectoryAsync(currentDirectory, cancellationToken);
+
+            if (Directory.GetParent(currentDirectory).ToString() == selectedDrive)
+            {
+              totalTopDirectoriesProcessed++;
+            }
+
+            string[] subDirectories = Directory.GetDirectories(currentDirectory);
+            foreach (string subDirectory in subDirectories)
+            {
+              queueDirectories.Enqueue(subDirectory);
+            }
+          }
+          catch (Exception ex)
+          {
+            Console.WriteLine($"Error al procesar el directorio {currentDirectory}: {ex.Message}");
+          }
         }
       });
-
+      if (!cancellationToken.IsCancellationRequested)
+      {
+        FinishProgressBar();
+      }
       if (dataGridResults.Items.IsEmpty)
       {
         textNoFiles.Visibility = Visibility.Visible;
@@ -124,28 +145,10 @@ namespace CodeChallengeApp
                 TotalSizeMB = GetTotalSizeMB(directoryPath),
                 TotalSizeBytes = GetTotalSizeBytes(directoryPath)
               });
-              processedDirectories.Add(directoryPath);
-              if (Directory.GetParent(directoryPath).ToString() == selectedDrive)
-              {
-                totalTopDirectoriesProcessed++;
-              }
+              processedDirectories.Add(directoryPath);             
               UpdateView(results);
             }
           }
-        }
-
-        List<Task<List<DirectoryResult>>> subDirTasks = new List<Task<List<DirectoryResult>>>();
-
-        foreach (string subDir in Directory.EnumerateDirectories(directoryPath))
-        {
-          subDirTasks.Add(SearchInDirectoryAsync(subDir, cancellationToken));
-        }
-
-        Task.WaitAll(subDirTasks.ToArray());
-
-        foreach (var task in subDirTasks)
-        {
-          results.AddRange(task.Result);
         }
       }
       catch (Exception ex)
@@ -205,15 +208,15 @@ namespace CodeChallengeApp
       if (!Directory.GetDirectories(selectedDrive, "*", SearchOption.TopDirectoryOnly).Any())
         return Directory.GetFiles(selectedDrive).Count();
 
-      return Directory.GetDirectories(selectedDrive, "*", SearchOption.TopDirectoryOnly).Count();
+      return Directory.GetDirectories(selectedDrive, "*", SearchOption.TopDirectoryOnly).Count() + 1; //Sum root directory.
     }
 
     private void UpdateProgressBar()
     {
+      
       Dispatcher.Invoke(() =>
       {
-        double progressPercentage = (double)totalTopDirectoriesProcessed / totalToProcess * 100;
-        progressBar.Value = progressPercentage;
+        progressBar.Value = (double)totalTopDirectoriesProcessed / totalToProcess * 100;
       });
     }
 
