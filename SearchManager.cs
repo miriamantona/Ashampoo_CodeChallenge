@@ -67,6 +67,7 @@ namespace CodeChallenge
             Console.WriteLine($"Error al procesar el directorio {currentDirectory}: {ex.Message}");
           }
         }
+        OnSearchFinished();
       });
     }
 
@@ -140,7 +141,7 @@ namespace CodeChallenge
 
     public async void Resume()
     {
-      cancellationToken = new CancellationToken();
+      cancellationTokenSource = new CancellationTokenSource();
       if (queueDirectories.Any())
         await SearchAsync(queueDirectories.Dequeue());
       else

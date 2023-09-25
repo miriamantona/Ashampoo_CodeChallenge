@@ -57,11 +57,18 @@ namespace CodeChallenge
 
     private void SearchManager_SearchFinished()
     {
-      if (!searchManager.HasDirectoriesToProcess())
+      mainWindow.Dispatcher.Invoke(() =>
       {
-        mainWindow.buttonSearch.IsEnabled = true;
-        ShowCompletedSearchMessage();
-      }
+        if (!searchManager.HasDirectoriesToProcess())
+        {
+          mainWindow.buttonSearch.IsEnabled = true;
+          ShowCompletedSearchMessage();
+          if (mainWindow.dataGridResults.Items.IsEmpty)
+          {
+            mainWindow.textNoFiles.Visibility = Visibility.Visible;
+          }
+        }
+      });
     }
 
     private void BlinkingTimer_Tick(object sender, EventArgs e)

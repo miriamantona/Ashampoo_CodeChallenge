@@ -20,7 +20,6 @@ namespace CodeChallengeApp
       textNoFiles.Visibility = Visibility.Hidden;
       searchManager = new SearchManager();
       uiManager = new UIManager(this, searchManager);
-      textNoFiles.Visibility = Visibility.Hidden;
     }
 
     // Event handlers
@@ -30,20 +29,12 @@ namespace CodeChallengeApp
       dialog.ShowDialog();
       textBoxFolder.Text = dialog.SelectedPath;
       dataGridResults.Items.Clear();
+      buttonSearch.IsEnabled = false;
       buttonPauseResume.IsEnabled = true;
+      textNoFiles.Visibility = Visibility.Hidden;
       uiManager.InitializeSearchingMessage();
 
       await searchManager.SearchAsync(dialog.SelectedPath);
-
-      if (!searchManager.IsCancelledRequested())
-      {
-        buttonSearch.IsEnabled = true;
-        uiManager.ShowCompletedSearchMessage();
-        if (dataGridResults.Items.IsEmpty)
-        {
-          textNoFiles.Visibility = Visibility.Visible;
-        }
-      }
     }
 
     private async void ButtonPauseResume_Click(object sender, RoutedEventArgs e)
