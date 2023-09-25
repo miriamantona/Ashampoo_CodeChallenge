@@ -1,4 +1,3 @@
-using CodeChallengeApp;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -85,11 +84,11 @@ namespace CodeChallenge
 
         if (!processedDirectories.Contains(directoryPath))
         {
-          if (file.Length > 10 * 1024 * 1024) // Verifica si el archivo es mayor a 10 MB
+          if (file.Length > 10 * 1024 * 1024)
           {
             results.Add(new DirectoryResult
             {
-              DirectoryPath = processedDirectories.Count + 1 + "-" + directoryPath,
+              DirectoryPath = directoryPath,
               FileCount = GetFileCount(directoryPath),
               TotalSizeMB = GetTotalSizeMB(directoryPath)
             });

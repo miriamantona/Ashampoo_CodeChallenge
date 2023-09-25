@@ -1,9 +1,7 @@
 using CodeChallenge;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Forms;
 
 namespace CodeChallengeApp
 {
@@ -41,13 +39,8 @@ namespace CodeChallengeApp
       {
         if (isPaused)
         {
-          if (searchManager.HasDirectoriesToProcess())
-          {
-            uiManager.Resume();
-            isPaused = false;
-          }
-          else
-            uiManager.PrepareWindowCompletedSearch();
+          uiManager.Resume();
+          isPaused = false;
         }
         else
         {

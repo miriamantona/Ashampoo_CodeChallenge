@@ -2,11 +2,10 @@ using CodeChallengeApp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Threading;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Threading;
 
 namespace CodeChallenge
 {
@@ -51,7 +50,7 @@ namespace CodeChallenge
       mainWindow.textBoxSearching.Visibility = Visibility.Visible;
       blinkingTimer = new DispatcherTimer();
       blinkingTimer.Tick += BlinkingTimer_Tick;
-      blinkingTimer.Interval = TimeSpan.FromMilliseconds(500); // Cambia la velocidad de parpadeo según sea necesario
+      blinkingTimer.Interval = TimeSpan.FromMilliseconds(500);¡
       blinkingTimer.Start();
     }
 
