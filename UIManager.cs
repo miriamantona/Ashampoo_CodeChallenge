@@ -15,10 +15,10 @@ namespace CodeChallenge
     private SearchManager searchManager;
     private DispatcherTimer blinkingTimer;
 
-    public UIManager(MainWindow window, SearchManager searchManager)
+    public UIManager(MainWindow window)
     {
       mainWindow = window;
-      this.searchManager = searchManager;
+      searchManager = new SearchManager();
       searchManager.SearchResultUpdated += SearchManager_SearchResultUpdated;
       searchManager.SearchFinished += SearchManager_SearchFinished;
     }
@@ -50,7 +50,7 @@ namespace CodeChallenge
       mainWindow.textBoxSearching.Visibility = Visibility.Visible;
       blinkingTimer = new DispatcherTimer();
       blinkingTimer.Tick += BlinkingTimer_Tick;
-      blinkingTimer.Interval = TimeSpan.FromMilliseconds(500);¡
+      blinkingTimer.Interval = TimeSpan.FromMilliseconds(500);
       blinkingTimer.Start();
     }
 

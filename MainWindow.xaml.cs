@@ -8,7 +8,6 @@ namespace CodeChallengeApp
   public partial class MainWindow : System.Windows.Window
   {
     private bool isPaused = false;
-    SearchManager searchManager;
     private UIManager uiManager;
 
     public MainWindow()
@@ -16,8 +15,7 @@ namespace CodeChallengeApp
       InitializeComponent();
       textBoxSearching.Visibility = Visibility.Hidden;
       textNoFiles.Visibility = Visibility.Hidden;
-      searchManager = new SearchManager();
-      uiManager = new UIManager(this, searchManager);
+      uiManager = new UIManager(this);
     }
 
     // Event handlers

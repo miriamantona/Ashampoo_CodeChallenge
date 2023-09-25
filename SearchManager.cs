@@ -111,11 +111,6 @@ namespace CodeChallenge
       SearchFinished?.Invoke();
     }
 
-    public bool IsCancelledRequested()
-    {
-      return cancellationToken.IsCancellationRequested;
-    }
-
     private int GetFileCount(string directory)
     {
       return Directory.GetFiles(directory).Length;
