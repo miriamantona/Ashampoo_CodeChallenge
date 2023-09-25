@@ -1,3 +1,4 @@
+using CodeChallengeApp;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -75,33 +76,26 @@ namespace CodeChallenge
     public async Task<List<DirectoryResult>> SearchInDirectoryAsync(string directoryPath)
     {
       List<DirectoryResult> results = new List<DirectoryResult>();
-      try
+      cancellationToken.ThrowIfCancellationRequested();
+
+      foreach (FileInfo file in new DirectoryInfo(directoryPath).GetFiles("*.*", SearchOption.TopDirectoryOnly))
       {
         cancellationToken.ThrowIfCancellationRequested();
 
-        foreach (FileInfo file in new DirectoryInfo(directoryPath).GetFiles("*.*", SearchOption.TopDirectoryOnly))
+        if (!processedDirectories.Contains(directoryPath))
         {
-          cancellationToken.ThrowIfCancellationRequested();
-
-          if (!processedDirectories.Contains(directoryPath))
+          if (file.Length > 10 * 1024 * 1024) // Verifica si el archivo es mayor a 10 MB
           {
-            if (file.Length > 10 * 1024 * 1024) // Verifica si el archivo es mayor a 10 MB
+            results.Add(new DirectoryResult
             {
-              results.Add(new DirectoryResult
-              {
-                DirectoryPath = processedDirectories.Count + 1 + "-" + directoryPath,
-                FileCount = GetFileCount(directoryPath),
-                TotalSizeMB = GetTotalSizeMB(directoryPath)
-              });
-              processedDirectories.Add(directoryPath);
-              OnSearchResultUpdated(results);
-            }
+              DirectoryPath = processedDirectories.Count + 1 + "-" + directoryPath,
+              FileCount = GetFileCount(directoryPath),
+              TotalSizeMB = GetTotalSizeMB(directoryPath)
+            });
+            processedDirectories.Add(directoryPath);
+            OnSearchResultUpdated(results);
           }
         }
-      }
-      catch (Exception ex)
-      {
-        Console.WriteLine("Error: " + ex.Message);
       }
 
       return results;

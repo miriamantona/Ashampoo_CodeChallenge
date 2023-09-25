@@ -1,8 +1,10 @@
 using CodeChallenge;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace CodeChallengeApp
 {
@@ -34,30 +36,50 @@ namespace CodeChallengeApp
       textNoFiles.Visibility = Visibility.Hidden;
       uiManager.InitializeSearchingMessage();
 
-      await searchManager.SearchAsync(dialog.SelectedPath);
+      try
+      {
+        await searchManager.SearchAsync(dialog.SelectedPath);
+      }
+      catch (Exception ex)
+      {
+        Dispatcher.Invoke(() =>
+        {
+          textErrorMessage.Text = "Error processing directories: " + ex.Message;
+        });
+      }
     }
 
     private async void ButtonPauseResume_Click(object sender, RoutedEventArgs e)
     {
-      if (isPaused)
+      try
       {
-        if (searchManager.HasDirectoriesToProcess())
+        if (isPaused)
         {
-          searchManager.Resume();
-          buttonPauseResume.Content = "Pause";
-          isPaused = false;
-          uiManager.InitializeSearchingMessage();
+          if (searchManager.HasDirectoriesToProcess())
+          {
+            searchManager.Resume();
+            buttonPauseResume.Content = "Pause";
+            isPaused = false;
+            uiManager.InitializeSearchingMessage();
+          }
+          else
+            uiManager.PrepareWindowCompletedSearch();
         }
         else
-          uiManager.ShowCompletedSearchMessage();
+        {
+          searchManager.Pause();
+          buttonPauseResume.Content = "Resume";
+          uiManager.StopBlinkingTimer();
+          isPaused = true;
+          await Task.Delay(100);
+        }
       }
-      else
+      catch (Exception ex)
       {
-        searchManager.Pause();
-        buttonPauseResume.Content = "Resume";
-        uiManager.StopBlinkingTimer();
-        isPaused = true;
-        await Task.Delay(100);
+        Dispatcher.Invoke(() =>
+        {
+          textErrorMessage.Text = "Error processing directories: " + ex.Message;
+        });
       }
     }
   }

@@ -17,5 +17,6 @@
         </DataGrid>
         <TextBlock x:Name="textNoFiles" Text="No results" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
         <TextBlock Name="textBoxSearching" Text="Searching..." FontSize="15" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="157,78,0,0" />
-    </Grid>
+        <TextBlock x:Name="textErrorMessage" Foreground="Red" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10,100,10,10" />
+  </Grid>
 </Window>
