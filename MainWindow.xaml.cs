@@ -25,19 +25,9 @@ namespace CodeChallengeApp
     // Event handlers
     private async void ButtonSelectFolder_ClickAsync(object sender, RoutedEventArgs e)
     {
-      var dialog = new FolderBrowserDialog();
-      dialog.ShowDialog();
-      textBoxFolder.Text = dialog.SelectedPath;
-      dataGridResults.Items.Clear();
-      buttonSearch.IsEnabled = false;
-      buttonPauseResume.IsEnabled = true;
-      textNoFiles.Visibility = Visibility.Hidden;
-      textErrorMessage.Visibility = Visibility.Hidden;
-      uiManager.InitializeSearchingMessage();
-
       try
       {
-        await searchManager.SearchAsync(dialog.SelectedPath);
+        await uiManager.EnableUserSearchAsync();
       }
       catch (Exception ex)
       {
@@ -53,20 +43,16 @@ namespace CodeChallengeApp
         {
           if (searchManager.HasDirectoriesToProcess())
           {
-            searchManager.Resume();
-            buttonPauseResume.Content = "Pause";
+            uiManager.Resume();
             isPaused = false;
-            uiManager.InitializeSearchingMessage();
           }
           else
             uiManager.PrepareWindowCompletedSearch();
         }
         else
         {
-          searchManager.Pause();
-          buttonPauseResume.Content = "Resume";
-          uiManager.StopBlinkingTimer();
           isPaused = true;
+          uiManager.Pause();
           await Task.Delay(100);
         }
       }

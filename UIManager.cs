@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using System.Windows;
+using System.Windows.Forms;
 
 namespace CodeChallenge
 {
@@ -21,6 +22,21 @@ namespace CodeChallenge
       this.searchManager = searchManager;
       searchManager.SearchResultUpdated += SearchManager_SearchResultUpdated;
       searchManager.SearchFinished += SearchManager_SearchFinished;
+    }
+
+    public async Task EnableUserSearchAsync()
+    {
+      var dialog = new FolderBrowserDialog();
+      dialog.ShowDialog();
+      mainWindow.textBoxFolder.Text = dialog.SelectedPath;
+      mainWindow.dataGridResults.Items.Clear();
+      mainWindow.buttonSearch.IsEnabled = false;
+      mainWindow.buttonPauseResume.IsEnabled = true;
+      mainWindow.textNoFiles.Visibility = Visibility.Hidden;
+      mainWindow.textErrorMessage.Visibility = Visibility.Hidden;
+      InitializeSearchingMessage();
+
+      await searchManager.SearchAsync(dialog.SelectedPath);
     }
 
     public void PrepareWindowForNewSearch()
@@ -49,6 +65,20 @@ namespace CodeChallenge
       {
         mainWindow.textNoFiles.Visibility = Visibility.Visible;
       }
+    }
+
+    public void Pause()
+    {
+      searchManager.Pause();
+      mainWindow.buttonPauseResume.Content = "Resume";
+      StopBlinkingTimer();
+    }
+
+    public void Resume()
+    {
+      searchManager.Resume();
+      mainWindow.buttonPauseResume.Content = "Pause";
+      InitializeSearchingMessage();
     }
 
     public void ShowErrorMessage(string message)
@@ -82,9 +112,9 @@ namespace CodeChallenge
       mainWindow.Dispatcher.Invoke(() =>
       {
         if (!searchManager.HasDirectoriesToProcess())
-        {          
+        {
           PrepareWindowCompletedSearch();
-          PrepareWindowForNewSearch();          
+          PrepareWindowForNewSearch();
         }
       });
     }

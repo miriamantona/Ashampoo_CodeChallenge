@@ -74,7 +74,6 @@ namespace CodeChallenge
       });
     }
 
-
     public async Task<List<DirectoryResult>> SearchInDirectoryAsync(string directoryPath)
     {
       List<DirectoryResult> results = new List<DirectoryResult>();
