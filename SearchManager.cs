@@ -125,7 +125,7 @@ namespace CodeChallenge
         totalSize += new FileInfo(file).Length;
       }
 
-      return (totalSize / (1024 * 1024));
+      return Math.Round(totalSize / (1024 * 1024), 2);
     }
 
     public async void Resume()
