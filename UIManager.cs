@@ -50,6 +50,19 @@ namespace CodeChallenge
         mainWindow.textNoFiles.Visibility = Visibility.Visible;
       }
     }
+
+    public void ShowErrorMessage(string message)
+    {
+      mainWindow.Dispatcher.Invoke(() =>
+      {
+        mainWindow.textErrorMessage.Text = "Error processing directories: " + message;
+        mainWindow.textErrorMessage.Visibility = Visibility.Visible;
+        StopBlinkingTimer();
+        mainWindow.textBoxSearching.Visibility = Visibility.Hidden;
+        PrepareWindowForNewSearch();
+      });
+    }
+
     private void SearchManager_SearchResultUpdated(List<DirectoryResult> results)
     {
       if (results.Any())

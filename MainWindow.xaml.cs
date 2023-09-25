@@ -34,6 +34,7 @@ namespace CodeChallengeApp
       buttonSearch.IsEnabled = false;
       buttonPauseResume.IsEnabled = true;
       textNoFiles.Visibility = Visibility.Hidden;
+      textErrorMessage.Visibility = Visibility.Hidden;
       uiManager.InitializeSearchingMessage();
 
       try
@@ -42,10 +43,7 @@ namespace CodeChallengeApp
       }
       catch (Exception ex)
       {
-        Dispatcher.Invoke(() =>
-        {
-          textErrorMessage.Text = "Error processing directories: " + ex.Message;
-        });
+        uiManager.ShowErrorMessage(ex.Message);
       }
     }
 
@@ -76,10 +74,7 @@ namespace CodeChallengeApp
       }
       catch (Exception ex)
       {
-        Dispatcher.Invoke(() =>
-        {
-          textErrorMessage.Text = "Error processing directories: " + ex.Message;
-        });
+        uiManager.ShowErrorMessage(ex.Message);
       }
     }
   }
