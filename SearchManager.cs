@@ -36,7 +36,9 @@ namespace CodeChallenge
       if (String.IsNullOrEmpty(selectedDrive))
         return;
 
-      processedDirectories = new List<string>();
+      if (!queueDirectories.Any())
+        processedDirectories = new List<string>();
+
       List<DirectoryResult> results = new List<DirectoryResult>();
 
       queueDirectories.Enqueue(selectedDrive);

@@ -4,13 +4,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace CodeChallengeApp
 {
   public partial class MainWindow : System.Windows.Window
   {
-    private List<DirectoryResult> results = new List<DirectoryResult>();
     private bool isPaused = false;
     SearchManager searchManager;
     private UIManager uiManager;
