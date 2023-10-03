@@ -1,11 +1,13 @@
 using CodeChallengeApp;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Threading;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace CodeChallenge
 {
@@ -23,25 +25,22 @@ namespace CodeChallenge
       searchManager.SearchFinished += SearchManager_SearchFinished;
     }
 
-    public async Task EnableUserSearchAsync()
+    public void PrepareWindowForNewSearch()
     {
-      var dialog = new FolderBrowserDialog();
-      dialog.ShowDialog();
-      mainWindow.textBoxFolder.Text = dialog.SelectedPath;
-      mainWindow.dataGridResults.Items.Clear();
-      mainWindow.buttonSearch.IsEnabled = false;
+      mainWindow.buttonPauseResume.IsEnabled = false;
+    }
+
+    public async Task SearchAsync(DriveInfo drive)
+    {
+      await searchManager.SearchAsync(drive.Name);
+    }
+
+    public void PrepareWindowForActiveSearch()
+    {
       mainWindow.buttonPauseResume.IsEnabled = true;
       mainWindow.textNoFiles.Visibility = Visibility.Hidden;
       mainWindow.textErrorMessage.Visibility = Visibility.Hidden;
       InitializeSearchingMessage();
-
-      await searchManager.SearchAsync(dialog.SelectedPath);
-    }
-
-    public void PrepareWindowForNewSearch()
-    {
-      mainWindow.buttonSearch.IsEnabled = true;
-      mainWindow.buttonPauseResume.IsEnabled = false;
     }
 
     public void InitializeSearchingMessage()

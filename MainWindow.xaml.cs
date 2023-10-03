@@ -1,5 +1,7 @@
 using CodeChallenge;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -15,15 +17,44 @@ namespace CodeChallengeApp
       InitializeComponent();
       textBoxSearching.Visibility = Visibility.Hidden;
       textNoFiles.Visibility = Visibility.Hidden;
+
+      List<string> drives = new List<string>();
+
+      DriveInfo[] driveInfos = DriveInfo.GetDrives();
+      foreach (DriveInfo driveInfo in driveInfos)
+      {
+        drives.Add(driveInfo.Name);
+      }
+
+      DriveList.ItemsSource = drives;
+
       uiManager = new UIManager(this);
     }
 
     // Event handlers
-    private async void ButtonSelectFolder_ClickAsync(object sender, RoutedEventArgs e)
+    private async void ButtonSearch_ClickAsync(object sender, RoutedEventArgs e)
     {
       try
       {
-        await uiManager.EnableUserSearchAsync();
+        if (DriveList.SelectedItems.Count == 0)
+        {
+          textErrorMessage.Text = "Please, select a drive";
+          textErrorMessage.Visibility = Visibility.Visible;
+        }
+        else
+        {
+          uiManager.PrepareWindowForActiveSearch();
+
+          foreach (string selectedDrive in DriveList.SelectedItems)
+          {
+            DriveInfo drive = new DriveInfo(selectedDrive);
+
+            if (drive.IsReady)
+            {
+              uiManager.SearchAsync(drive);
+            }
+          }
+        }
       }
       catch (Exception ex)
       {
