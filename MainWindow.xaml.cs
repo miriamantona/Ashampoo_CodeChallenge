@@ -47,7 +47,7 @@ namespace CodeChallengeApp
 
           foreach (string selectedDrive in DriveList.SelectedItems)
           {
-            Task.Run(async () =>
+            _ = Task.Run(async() =>
             {
               DriveInfo drive = new DriveInfo(selectedDrive);
 

@@ -23,7 +23,7 @@ namespace CodeChallenge
 
     public void AddQueue(Queue<string> queue)
     {
-      this.queues.Add(queue); 
+      this.queues.Add(queue);
     }
 
 
@@ -43,9 +43,7 @@ namespace CodeChallenge
 
       List<DirectoryResult> results = new List<DirectoryResult>();
 
-      List<Task> tasks = new List<Task>();
-
-      await Task.Run(async () =>
+      _ = Task.Run(() =>
       {
         while (queueDirectories.Count > 0)
         {
