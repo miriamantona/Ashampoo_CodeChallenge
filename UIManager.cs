@@ -32,7 +32,10 @@ namespace CodeChallenge
 
     public async Task SearchAsync(DriveInfo drive)
     {
-      await searchManager.SearchAsync(drive.Name);
+      Queue<string> queueDirectories = new Queue<string>();
+      queueDirectories.Enqueue(drive.Name);
+      searchManager.AddQueue(queueDirectories);
+      searchManager.SearchAsync(queueDirectories);
     }
 
     public void PrepareWindowForActiveSearch()

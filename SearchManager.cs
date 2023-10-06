@@ -10,15 +10,21 @@ namespace CodeChallenge
   public class SearchManager
   {
     private List<string> processedDirectories;
-    private CancellationTokenSource cancellationTokenSource;
-    private CancellationToken cancellationToken;
-    private Queue<string> queueDirectories = new Queue<string>();
 
     public delegate void SearchResultUpdatedEventHandler(List<DirectoryResult> results);
     public event SearchResultUpdatedEventHandler SearchResultUpdated;
 
     public delegate void SearchFinishedEventHandler();
     public event SearchFinishedEventHandler SearchFinished;
+
+    public CancellationTokenSource cancellationTokenSource;
+
+    private List<Queue<string>> queues = new List<Queue<string>>();
+
+    public void AddQueue(Queue<string> queue)
+    {
+      this.queues.Add(queue); 
+    }
 
 
     public SearchManager()
@@ -27,12 +33,9 @@ namespace CodeChallenge
       cancellationTokenSource = new CancellationTokenSource();
     }
 
-    public async Task SearchAsync(string selectedDrive)
+    public async Task SearchAsync(Queue<string> queueDirectories)
     {
-      cancellationTokenSource = new CancellationTokenSource();
-      cancellationToken = cancellationTokenSource.Token;
-
-      if (String.IsNullOrEmpty(selectedDrive))
+      if (queueDirectories == null)
         return;
 
       if (!queueDirectories.Any())
@@ -40,7 +43,6 @@ namespace CodeChallenge
 
       List<DirectoryResult> results = new List<DirectoryResult>();
 
-      queueDirectories.Enqueue(selectedDrive);
       List<Task> tasks = new List<Task>();
 
       await Task.Run(async () =>
@@ -51,12 +53,12 @@ namespace CodeChallenge
 
           try
           {
-            if (cancellationToken.IsCancellationRequested)
+            if (cancellationTokenSource.IsCancellationRequested)
             {
               break;
             }
 
-            await SearchInDirectoryAsync(currentDirectory);
+            SearchInDirectoryAsync(currentDirectory);
 
             string[] subDirectories = Directory.GetDirectories(currentDirectory);
             foreach (string subDirectory in subDirectories)
@@ -76,11 +78,13 @@ namespace CodeChallenge
     public async Task<List<DirectoryResult>> SearchInDirectoryAsync(string directoryPath)
     {
       List<DirectoryResult> results = new List<DirectoryResult>();
-      cancellationToken.ThrowIfCancellationRequested();
 
       foreach (FileInfo file in new DirectoryInfo(directoryPath).GetFiles("*.*", SearchOption.TopDirectoryOnly))
       {
-        cancellationToken.ThrowIfCancellationRequested();
+        if (cancellationTokenSource.IsCancellationRequested)
+        {
+          break;
+        }
 
         if (!processedDirectories.Contains(directoryPath))
         {
@@ -131,20 +135,27 @@ namespace CodeChallenge
     public async void Resume()
     {
       cancellationTokenSource = new CancellationTokenSource();
-      if (queueDirectories.Any())
+      foreach (var queue in queues)
+      {
+        Task.Run(async () =>
+        {
+          SearchAsync(queue);
+        });
+      }
+
+      /*if (queueDirectories.Any())
         await SearchAsync(queueDirectories.Dequeue());
       else
-        OnSearchFinished();
+        OnSearchFinished();*/
     }
 
     public void Pause()
     {
       cancellationTokenSource?.Cancel();
     }
-
     public bool HasDirectoriesToProcess()
     {
-      return queueDirectories.Any();
+      return queues.Any();
     }
   }
 }

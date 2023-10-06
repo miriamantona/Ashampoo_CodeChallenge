@@ -47,12 +47,15 @@ namespace CodeChallengeApp
 
           foreach (string selectedDrive in DriveList.SelectedItems)
           {
-            DriveInfo drive = new DriveInfo(selectedDrive);
-
-            if (drive.IsReady)
+            Task.Run(async () =>
             {
-              uiManager.SearchAsync(drive);
-            }
+              DriveInfo drive = new DriveInfo(selectedDrive);
+
+              if (drive.IsReady)
+              {
+                uiManager.SearchAsync(drive);
+              }
+            });
           }
         }
       }
