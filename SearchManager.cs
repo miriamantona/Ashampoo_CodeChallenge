@@ -43,7 +43,7 @@ namespace CodeChallenge
 
       List<DirectoryResult> results = new List<DirectoryResult>();
 
-      _ = Task.Run(() =>
+      _ = Task.Run(async() =>
       {
         while (queueDirectories.Count > 0)
         {
@@ -69,7 +69,7 @@ namespace CodeChallenge
             Console.WriteLine($"Error al procesar el directorio {currentDirectory}: {ex.Message}");
           }
         }
-        OnSearchFinished();
+        //OnSearchFinished();
       });
     }
 

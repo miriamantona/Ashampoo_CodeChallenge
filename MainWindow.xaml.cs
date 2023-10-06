@@ -17,13 +17,17 @@ namespace CodeChallengeApp
       InitializeComponent();
       textBoxSearching.Visibility = Visibility.Hidden;
       textNoFiles.Visibility = Visibility.Hidden;
+      buttonPauseResume.Visibility = Visibility.Hidden;
 
       List<string> drives = new List<string>();
 
-      DriveInfo[] driveInfos = DriveInfo.GetDrives();
-      foreach (DriveInfo driveInfo in driveInfos)
+      DriveInfo[] drivesInfo = DriveInfo.GetDrives();
+      foreach (DriveInfo driveInfo in drivesInfo)
       {
-        drives.Add(driveInfo.Name);
+        if (driveInfo.IsReady)
+        {
+          drives.Add(driveInfo.Name);
+        }
       }
 
       DriveList.ItemsSource = drives;
@@ -45,18 +49,20 @@ namespace CodeChallengeApp
         {
           uiManager.PrepareWindowForActiveSearch();
 
+          List<Task> tasks = new List<Task>();
+
           foreach (string selectedDrive in DriveList.SelectedItems)
           {
-            _ = Task.Run(async() =>
+            tasks.Add(Task.Run(async () =>
             {
               DriveInfo drive = new DriveInfo(selectedDrive);
-
-              if (drive.IsReady)
-              {
-                uiManager.SearchAsync(drive);
-              }
-            });
+              await uiManager.SearchAsync(drive);
+            }));
           }
+
+          //await Task.WhenAll(tasks);
+
+          //uiManager.PrepareWindowCompletedSearch();
         }
       }
       catch (Exception ex)

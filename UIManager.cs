@@ -22,7 +22,7 @@ namespace CodeChallenge
       mainWindow = window;
       searchManager = new SearchManager();
       searchManager.SearchResultUpdated += SearchManager_SearchResultUpdated;
-      searchManager.SearchFinished += SearchManager_SearchFinished;
+      //searchManager.SearchFinished += SearchManager_SearchFinished;
     }
 
     public void PrepareWindowForNewSearch()
@@ -40,7 +40,9 @@ namespace CodeChallenge
 
     public void PrepareWindowForActiveSearch()
     {
+      mainWindow.buttonPauseResume.Visibility = Visibility.Visible;
       mainWindow.buttonPauseResume.IsEnabled = true;
+      mainWindow.buttonSearch.IsEnabled = false;
       mainWindow.textNoFiles.Visibility = Visibility.Hidden;
       mainWindow.textErrorMessage.Visibility = Visibility.Hidden;
       InitializeSearchingMessage();
@@ -61,6 +63,7 @@ namespace CodeChallenge
       StopBlinkingTimer();
       mainWindow.textBoxSearching.Text = "Search Completed";
       mainWindow.textBoxSearching.Visibility = Visibility.Visible;
+      mainWindow.buttonSearch.Visibility = Visibility.Visible;
 
       if (mainWindow.dataGridResults.Items.IsEmpty)
       {
@@ -108,17 +111,17 @@ namespace CodeChallenge
       }
     }
 
-    private void SearchManager_SearchFinished()
+    /*private void SearchManager_SearchFinished()
     {
       mainWindow.Dispatcher.Invoke(() =>
       {
         if (!searchManager.HasDirectoriesToProcess())
-        {
+        { 
           PrepareWindowCompletedSearch();
           PrepareWindowForNewSearch();
         }
       });
-    }
+    }*/
 
     private void BlinkingTimer_Tick(object sender, EventArgs e)
     {
