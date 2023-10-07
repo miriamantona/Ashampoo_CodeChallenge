@@ -1,95 +1,33 @@
 using CodeChallenge;
-using System;
+using CodeChallenge.ViewModel;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using System.Windows;
+using System.Linq;
 
 namespace CodeChallengeApp
 {
   public partial class MainWindow : System.Windows.Window
   {
-    private bool isPaused = false;
-    private UIManager uiManager;
-
     public MainWindow()
     {
       InitializeComponent();
-      textBoxSearching.Visibility = Visibility.Hidden;
-      textNoFiles.Visibility = Visibility.Hidden;
-      buttonPauseResume.Visibility = Visibility.Hidden;
 
-      List<string> drives = new List<string>();
+      SearchManager searchManager = new SearchManager();
+      DataContext = new MainWindowViewModel(searchManager);
 
-      DriveInfo[] drivesInfo = DriveInfo.GetDrives();
-      foreach (DriveInfo driveInfo in drivesInfo)
-      {
-        if (driveInfo.IsReady)
-        {
-          drives.Add(driveInfo.Name);
-        }
-      }
-
-      DriveList.ItemsSource = drives;
-
-      uiManager = new UIManager(this);
+      searchManager.SearchResultUpdated += HandleSearchResultUpdated;
     }
 
-    // Event handlers
-    private async void ButtonSearch_ClickAsync(object sender, RoutedEventArgs e)
+    private void HandleSearchResultUpdated(List<DirectoryResult> results)
     {
-      try
+      if (results.Any())
       {
-        if (DriveList.SelectedItems.Count == 0)
+        Dispatcher.Invoke(() =>
         {
-          textErrorMessage.Text = "Please, select a drive";
-          textErrorMessage.Visibility = Visibility.Visible;
-        }
-        else
-        {
-          uiManager.PrepareWindowForActiveSearch();
-
-          List<Task> tasks = new List<Task>();
-
-          foreach (string selectedDrive in DriveList.SelectedItems)
+          foreach (var result in results)
           {
-            tasks.Add(Task.Run(async () =>
-            {
-              DriveInfo drive = new DriveInfo(selectedDrive);
-              await uiManager.SearchAsync(drive);
-            }));
+            dataGridResults.Items.Add(result);
           }
-
-          //await Task.WhenAll(tasks);
-
-          //uiManager.PrepareWindowCompletedSearch();
-        }
-      }
-      catch (Exception ex)
-      {
-        uiManager.ShowErrorMessage(ex.Message);
-      }
-    }
-
-    private async void ButtonPauseResume_Click(object sender, RoutedEventArgs e)
-    {
-      try
-      {
-        if (isPaused)
-        {
-          uiManager.Resume();
-          isPaused = false;
-        }
-        else
-        {
-          isPaused = true;
-          uiManager.Pause();
-          await Task.Delay(100);
-        }
-      }
-      catch (Exception ex)
-      {
-        uiManager.ShowErrorMessage(ex.Message);
+        });
       }
     }
   }

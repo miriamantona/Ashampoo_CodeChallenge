@@ -21,7 +21,7 @@ namespace CodeChallenge
     {
       mainWindow = window;
       searchManager = new SearchManager();
-      searchManager.SearchResultUpdated += SearchManager_SearchResultUpdated;
+      //searchManager.SearchResultUpdated += SearchManager_SearchResultUpdated;
       //searchManager.SearchFinished += SearchManager_SearchFinished;
     }
 
@@ -38,15 +38,6 @@ namespace CodeChallenge
       searchManager.SearchAsync(queueDirectories);
     }
 
-    public void PrepareWindowForActiveSearch()
-    {
-      mainWindow.buttonPauseResume.Visibility = Visibility.Visible;
-      mainWindow.buttonPauseResume.IsEnabled = true;
-      mainWindow.buttonSearch.IsEnabled = false;
-      mainWindow.textNoFiles.Visibility = Visibility.Hidden;
-      mainWindow.textErrorMessage.Visibility = Visibility.Hidden;
-      InitializeSearchingMessage();
-    }
 
     public void InitializeSearchingMessage()
     {
