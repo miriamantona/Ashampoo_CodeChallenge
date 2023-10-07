@@ -37,7 +37,7 @@ namespace CodeChallengeApp.ViewModel.Commands
     {
       if (m_ViewModel.IsPaused)
       {
-        //uiManager.Resume();
+        m_ViewModel.SearchManager.Resume();
         m_ViewModel.PauseResumeButtonText = "Pause";
         m_ViewModel.IsPaused = false;
       }
@@ -45,7 +45,7 @@ namespace CodeChallengeApp.ViewModel.Commands
       {
         m_ViewModel.PauseResumeButtonText = "Resume";
         m_ViewModel.IsPaused = true;
-        //uiManager.Pause();
+        m_ViewModel.SearchManager.Pause();
       }
     }
   }
