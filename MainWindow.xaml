@@ -16,17 +16,17 @@
     <TextBlock Text="Find all directories that directly contain individual files larger than 10 MB" 
            HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"/>
     <ListBox Name="DriveList" 
-         ItemsSource="{Binding DriveListViewModel.Drives}" 
+         ItemsSource="{Binding Drives}" 
          SelectionMode="Multiple"
          Margin="10,31,692,438">
-      <ListBox.ItemTemplate>
-        <DataTemplate>
-          <DockPanel>
-            <CheckBox IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}, Path=IsSelected}" DockPanel.Dock="Left" />
-            <TextBlock Text="{Binding}" />
-          </DockPanel>
-        </DataTemplate>
-      </ListBox.ItemTemplate>
+    <ListBox.ItemTemplate>
+      <DataTemplate>
+        <DockPanel>
+          <CheckBox IsChecked="{Binding IsSelected}" DockPanel.Dock="Left" />
+          <TextBlock Text="{Binding Name}" />
+        </DockPanel>
+      </DataTemplate>
+    </ListBox.ItemTemplate>
     </ListBox>
     <Button x:Name="buttonSearch" IsEnabled="{Binding IsSearching, Converter={StaticResource BooleanNegationConverter}}" Command="{Binding Search}" Content="Search" VerticalAlignment="Top" HorizontalAlignment="Left" Width="98" Margin="127,31,0,0"/>
     <Button x:Name="buttonPauseResume" Content="{Binding PauseResumeButtonText}" IsEnabled="{Binding IsSearching}" Command="{Binding PauseResume}" VerticalAlignment="Top" HorizontalAlignment="Left" Width="98" Margin="127,61,0,0"/>

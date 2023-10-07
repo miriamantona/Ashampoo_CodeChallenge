@@ -7,11 +7,13 @@ namespace CodeChallengeApp
 {
   public partial class MainWindow : System.Windows.Window
   {
+    SearchManager searchManager;
+
     public MainWindow()
     {
       InitializeComponent();
 
-      SearchManager searchManager = new SearchManager();
+      searchManager = new SearchManager();
       DataContext = new MainWindowViewModel(searchManager);
 
       searchManager.SearchResultUpdated += HandleSearchResultUpdated;
@@ -29,6 +31,6 @@ namespace CodeChallengeApp
           }
         });
       }
-    }
+    }    
   }
 }

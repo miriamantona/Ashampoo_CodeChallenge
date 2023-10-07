@@ -1,19 +1,20 @@
+using CodeChallengeApp;
 using CodeChallengeApp.Utilities;
 using CodeChallengeApp.ViewModel.Commands;
-using Prism.Mvvm;
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
+using System.IO;
 using System.Windows.Input;
 
 namespace CodeChallenge.ViewModel
 {
   public class MainWindowViewModel : ViewModelBase
   {
+    private List<Drive> _drives;
+    public List<Drive> Drives
+    {
+      get { return _drives; }
+    }
+
     private bool _isSearching;
     public bool IsSearching
     {
@@ -76,19 +77,33 @@ namespace CodeChallenge.ViewModel
     public ICommand Search { get; set; }
     public ICommand PauseResume { get; set; }
 
-    public DriveListViewModel DriveListViewModel { get; set; }
 
     public MainWindowViewModel(SearchManager searchManager)
     {
       this.Initialize();
       SearchManager = searchManager;
+      SearchManager.SearchFinished += HandleSearchFinished;
+
+      DriveInfo[] drivesInfo = DriveInfo.GetDrives();
+      _drives = new();
+      foreach (DriveInfo driveInfo in drivesInfo)
+      {
+        if (driveInfo.IsReady)
+        {
+          _drives.Add(new Drive { Name = driveInfo.Name, IsSelected = false });
+        }
+      }
     }
 
     private void Initialize()
     {
       this.Search = new SearchCommand(this);
       this.PauseResume = new PauseResumeCommand(this);
-      DriveListViewModel = new DriveListViewModel();
+    }
+
+    private void HandleSearchFinished()
+    {
+      this.IsSearching = false;
     }
   }
 }

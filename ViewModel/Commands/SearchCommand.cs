@@ -3,7 +3,10 @@ using CodeChallenge.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -54,55 +57,47 @@ namespace CodeChallengeApp.ViewModel.Commands
     {
       m_ViewModel.IsSearching = true;
 
-      //Cambiar a SELECTED!!
+      var selectedDrives = m_ViewModel.Drives.Where(d => d.IsSelected).ToList();
 
-      DriveInfo[] drivesInfo = DriveInfo.GetDrives();
-      foreach (DriveInfo driveInfo in drivesInfo)
+      List<Task> taskList = new();
+
+      foreach (var drive in selectedDrives)
       {
-        if (driveInfo.IsReady)
-        {
-          List<Task> tasks = new List<Task>();
+        Queue<string> queueDirectories = new Queue<string>();
+        queueDirectories.Enqueue(drive.Name);
+        m_ViewModel.SearchManager.AddQueue(queueDirectories);
 
-          tasks.Add(Task.Run(async () =>
-          {
-            Queue<string> queueDirectories = new Queue<string>();
-            queueDirectories.Enqueue(driveInfo.Name);
-            m_ViewModel.SearchManager.AddQueue(queueDirectories);
-            m_ViewModel.SearchManager.SearchAsync(queueDirectories);
-          }));
-        }
+        taskList.Add(Task.Run(() => m_ViewModel.SearchManager.SearchAsync(queueDirectories)));
       }
 
-        //await Task.WhenAll(tasks);
-
-        //uiManager.PrepareWindowCompletedSearch();
-
-
-        /*foreach (string selectedDrive in selectedDrives)
+      Task.Run(() =>
+      {
+        while (m_ViewModel.SearchManager.HasDirectoriesToProcess)
         {
-          // Hacer algo con selectedDrive...
-        }*/
-        /*
-        try
-        {
-          if (DriveList.SelectedItems.Count == 0)
-          {
-            textErrorMessage.Text = "Please, select a drive";
-            textErrorMessage.Visibility = Visibility.Visible;
-          }
-          else
-          {
-
-          }
+          m_ViewModel.IsSearching = true;
+          Thread.Sleep(100);
         }
-        catch (Exception ex)
+        m_ViewModel.IsSearching = false;
+      });
+      /*
+      try
+      {
+        if (DriveList.SelectedItems.Count == 0)
         {
-          uiManager.ShowErrorMessage(ex.Message);
-        }*/
-        //var selectedItem = m_ViewModel.SelectedItem;
-        //m_ViewModel.GroceryList.Remove(selectedItem);
-      }
+          textErrorMessage.Text = "Please, select a drive";
+          textErrorMessage.Visibility = Visibility.Visible;
+        }
+        else
+        {
 
-      #endregion
+        }
+      }
+      catch (Exception ex)
+      {
+        uiManager.ShowErrorMessage(ex.Message);
+      }*/
     }
+
+    #endregion
   }
+}

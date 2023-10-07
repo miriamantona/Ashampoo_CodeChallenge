@@ -20,12 +20,12 @@ namespace CodeChallenge
     public CancellationTokenSource cancellationTokenSource;
 
     private List<Queue<string>> queues = new List<Queue<string>>();
+    
 
-    public void AddQueue(Queue<string> queue)
+    public bool HasDirectoriesToProcess
     {
-      this.queues.Add(queue);
+      get { return queues.Any(); }
     }
-
 
     public SearchManager()
     {
@@ -33,7 +33,12 @@ namespace CodeChallenge
       cancellationTokenSource = new CancellationTokenSource();
     }
 
-    public async Task SearchAsync(Queue<string> queueDirectories)
+  public void AddQueue(Queue<string> queue)
+  {
+    this.queues.Add(queue);
+  }
+
+  public async Task SearchAsync(Queue<string> queueDirectories)
     {
       if (queueDirectories == null)
         return;
@@ -68,8 +73,7 @@ namespace CodeChallenge
           {
             Console.WriteLine($"Error al procesar el directorio {currentDirectory}: {ex.Message}");
           }
-        }
-        //OnSearchFinished();
+        }        
       });
     }
 
@@ -150,10 +154,6 @@ namespace CodeChallenge
     public void Pause()
     {
       cancellationTokenSource?.Cancel();
-    }
-    public bool HasDirectoriesToProcess()
-    {
-      return queues.Any();
     }
   }
 }
