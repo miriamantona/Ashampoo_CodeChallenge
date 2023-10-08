@@ -11,9 +11,9 @@ namespace CodeChallengeApp.ViewModel.Commands
   {
 
     // Member variables
-    private readonly MainWindowViewModel m_ViewModel;
+    private readonly SearchViewModel m_ViewModel;
 
-    public SearchCommand(MainWindowViewModel viewModel)
+    public SearchCommand(SearchViewModel viewModel)
     {
       m_ViewModel = viewModel;
     }

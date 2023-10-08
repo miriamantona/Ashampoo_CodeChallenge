@@ -3,12 +3,16 @@ using CodeChallengeApp.Model;
 using CodeChallengeApp.Utilities;
 using CodeChallengeApp.ViewModel.Commands;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace CodeChallengeApp.ViewModel
 {
-  public class MainWindowViewModel : ViewModelBase
+  public class SearchViewModel : ViewModelBase
   {
     private List<Drive> _drives;
     public List<Drive> Drives
@@ -124,16 +128,32 @@ namespace CodeChallengeApp.ViewModel
       }
     }
 
+    private ObservableCollection<DirectoryResult> _directoriesResult;
+    public ObservableCollection<DirectoryResult> DirectoriesResult
+    {
+      get { return _directoriesResult; }
+      set
+      {
+        if (_directoriesResult != value)
+        {
+          _directoriesResult = value;
+          RaisePropertyChangedEvent(nameof(DirectoriesResult));
+        }
+      }
+    }
 
     public ICommand Search { get; set; }
     public ICommand PauseResume { get; set; }
 
 
-    public MainWindowViewModel(SearchManager searchManager)
+    public SearchViewModel()
     {
       this.Initialize();
-      SearchManager = searchManager;
-      SearchManager.SearchFinished += HandleSearchFinished;
+      _searchManager = new SearchManager();
+      _searchManager.SearchFinished += HandleSearchFinished;
+      _searchManager.SearchResultUpdated += HandleSearchResultUpdated;
+
+      _directoriesResult = new ObservableCollection<DirectoryResult>();
 
       DriveInfo[] drivesInfo = DriveInfo.GetDrives();
       _drives = new();
@@ -156,6 +176,16 @@ namespace CodeChallengeApp.ViewModel
     {
       this.IsSearching = false;
       this.IsSearchCompleted = true;
+    }
+    private void HandleSearchResultUpdated(List<DirectoryResult> results)
+    {
+      if (results.Any())
+      {
+        foreach (var result in results)
+        {
+          Application.Current.Dispatcher.Invoke(() => DirectoriesResult.Add(result));
+        }
+      }
     }
   }
 }

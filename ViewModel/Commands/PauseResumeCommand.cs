@@ -5,9 +5,9 @@ namespace CodeChallengeApp.ViewModel.Commands
 {
   public class PauseResumeCommand : ICommand
   {
-    private readonly MainWindowViewModel m_ViewModel;
+    private readonly SearchViewModel m_ViewModel;
 
-    public PauseResumeCommand(MainWindowViewModel viewModel)
+    public PauseResumeCommand(SearchViewModel viewModel)
     {
       m_ViewModel = viewModel;
     }
