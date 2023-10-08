@@ -8,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Threading;
 
 namespace CodeChallengeApp.ViewModel
 {
@@ -58,8 +57,14 @@ namespace CodeChallengeApp.ViewModel
         {
           _isSearchCompleted = value;
           RaisePropertyChangedEvent(nameof(IsSearchCompleted));
+          RaisePropertyChangedEvent(nameof(NoResultsInSearch));
         }
       }
+    }
+
+    public bool NoResultsInSearch
+    {
+      get { return _isSearchCompleted && (_directoriesResult == null || _directoriesResult.Count == 0); }
     }
 
     private string _pauseResumeButtonText = "Pause";
@@ -159,10 +164,7 @@ namespace CodeChallengeApp.ViewModel
       _drives = new();
       foreach (DriveInfo driveInfo in drivesInfo)
       {
-        if (driveInfo.IsReady)
-        {
-          _drives.Add(new Drive { Name = driveInfo.Name, IsSelected = false });
-        }
+        _drives.Add(new Drive { Name = driveInfo.Name, IsSelected = false });
       }
     }
 

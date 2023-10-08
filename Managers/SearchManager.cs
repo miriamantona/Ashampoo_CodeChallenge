@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -74,6 +75,8 @@ namespace CodeChallengeApp.Managers
         directoriesQueue.IsCompleted = true;
         if (!queues.Any(q => q.IsCompleted == false))
         {
+          queues.Clear();
+          processedDirectories.Clear();
           OnSearchFinished();
         }
       }

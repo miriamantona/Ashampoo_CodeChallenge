@@ -63,8 +63,7 @@
       </DataGrid.Columns>
     </DataGrid>
 
-    <TextBlock Grid.Row="2" x:Name="textNoFiles" Text="No results" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                       Visibility="Collapsed"/>
+    <TextBlock Grid.Row="2" x:Name="textNoFiles"  Visibility="{Binding NoResultsInSearch, Converter={StaticResource BooleanToVisibilityConverter}}"  Text="No results" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
     <TextBlock Grid.Row="1" x:Name="textBoxSearching" Text="Searching..." FontSize="15"
                        HorizontalAlignment="Left" VerticalAlignment="Top" Margin="200,4,2,0"
