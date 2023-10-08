@@ -72,7 +72,7 @@ namespace CodeChallengeApp.Managers
           }
           catch (Exception ex)
           {
-            Console.WriteLine($"Error al procesar el directorio {currentDirectory}: {ex.Message}");
+            Console.WriteLine($"Error processing directory {currentDirectory}: {ex.Message}");
           }
         }
         if (!cancellationTokenSource.IsCancellationRequested)

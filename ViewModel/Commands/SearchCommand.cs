@@ -9,36 +9,20 @@ namespace CodeChallengeApp.ViewModel.Commands
 {
   public class SearchCommand : ICommand
   {
-    #region Fields
 
     // Member variables
     private readonly MainWindowViewModel m_ViewModel;
-
-    #endregion
-
-    #region Constructor
 
     public SearchCommand(MainWindowViewModel viewModel)
     {
       m_ViewModel = viewModel;
     }
 
-
-    #endregion
-
-    #region ICommand Members
-
-    /// <summary>
-    /// Whether this command can be executed.
-    /// </summary>
     public bool CanExecute(object parameter)
     {
       return true;
     }
 
-    /// <summary>
-    /// Fires when the CanExecute status of this command changes.
-    /// </summary>
     public event EventHandler CanExecuteChanged
     {
       add { CommandManager.RequerySuggested += value; }
@@ -56,6 +40,7 @@ namespace CodeChallengeApp.ViewModel.Commands
         {
           m_ViewModel.HasError = true;
           m_ViewModel.ErrorMessage = "Please, select a drive";
+          m_ViewModel.IsSearchCompleted = false;
         }
         else
         {
@@ -79,7 +64,5 @@ namespace CodeChallengeApp.ViewModel.Commands
         m_ViewModel.ErrorMessage = ex.Message;
       }
     }
-
-    #endregion
   }
 }
