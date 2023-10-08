@@ -42,42 +42,41 @@ namespace CodeChallengeApp.Managers
 
       List<DirectoryResult> results = new List<DirectoryResult>();
 
-      _ = Task.Run(() =>
+
+      while (directoriesQueue.Queue.Count > 0)
       {
-        while (directoriesQueue.Queue.Count > 0)
+        string currentDirectory = directoriesQueue.Queue.Dequeue();
+
+        try
         {
-          string currentDirectory = directoriesQueue.Queue.Dequeue();
-
-          try
+          if (cancellationTokenSource.IsCancellationRequested)
           {
-            if (cancellationTokenSource.IsCancellationRequested)
-            {
-              break;
-            }
-
-            SearchInDirectoryAsync(currentDirectory);
-
-            string[] subDirectories = Directory.GetDirectories(currentDirectory);
-            foreach (string subDirectory in subDirectories)
-            {
-              directoriesQueue.Queue.Enqueue(subDirectory);
-            }
+            break;
           }
-          catch (Exception ex)
+
+          Task.Run(() => SearchInDirectoryAsync(currentDirectory));
+
+          string[] subDirectories = Directory.GetDirectories(currentDirectory);
+          foreach (string subDirectory in subDirectories)
           {
-            //Log the error or whatever applies.
-            Console.WriteLine($"Error processing directory {currentDirectory}: {ex.Message}");
+            directoriesQueue.Queue.Enqueue(subDirectory);
           }
         }
-        if (!cancellationTokenSource.IsCancellationRequested)
+        catch (Exception ex)
         {
-          directoriesQueue.IsCompleted = true;
-          if (!queues.Any(q => q.IsCompleted == false))
-          {
-            OnSearchFinished();
-          }
+          //Log the error or whatever applies.
+          Console.WriteLine($"Error processing directory {currentDirectory}: {ex.Message}");
         }
-      });
+      }
+
+      if (!cancellationTokenSource.IsCancellationRequested)
+      {
+        directoriesQueue.IsCompleted = true;
+        if (!queues.Any(q => q.IsCompleted == false))
+        {
+          OnSearchFinished();
+        }
+      }
     }
 
     public async Task<List<DirectoryResult>> SearchInDirectoryAsync(string directoryPath)
