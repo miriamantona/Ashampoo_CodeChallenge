@@ -1,6 +1,7 @@
 using CodeChallengeApp.Managers;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -47,14 +48,14 @@ namespace CodeChallengeApp.ViewModel.Commands
           m_ViewModel.IsSearching = true;
           m_ViewModel.IsSearchCompleted = false;
           m_ViewModel.HasError = false;
+          m_ViewModel.DirectoriesResult = new ObservableCollection<Model.DirectoryResult>();
 
-          List<Task> taskList = new();
 
           foreach (var drive in selectedDrives)
           {
             var directoriesQueue = new DirectoriesQueue(drive.Name);
             m_ViewModel.SearchManager.AddQueue(directoriesQueue);
-            taskList.Add(Task.Run(() => m_ViewModel.SearchManager.SearchAsync(directoriesQueue)));
+            Task.Run(() => m_ViewModel.SearchManager.SearchAsync(directoriesQueue));
           }
         }
       }

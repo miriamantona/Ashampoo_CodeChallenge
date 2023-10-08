@@ -149,7 +149,7 @@ namespace CodeChallengeApp.Managers
       cancellationTokenSource = new CancellationTokenSource();
       foreach (var queue in queues)
       {
-        Task.Run(async () =>
+        Task.Run(() =>
         {
           SearchAsync(queue);
         });
