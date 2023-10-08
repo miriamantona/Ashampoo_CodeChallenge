@@ -72,6 +72,7 @@ namespace CodeChallengeApp.Managers
           }
           catch (Exception ex)
           {
+            //Log the error or whatever applies.
             Console.WriteLine($"Error processing directory {currentDirectory}: {ex.Message}");
           }
         }
