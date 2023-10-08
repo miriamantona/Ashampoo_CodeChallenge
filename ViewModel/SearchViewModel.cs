@@ -153,7 +153,14 @@ namespace CodeChallengeApp.ViewModel
 
     public SearchViewModel()
     {
-      this.Initialize();
+      this.Initialize();      
+    }
+
+    private void Initialize()
+    {
+      this.Search = new SearchCommand(this);
+      this.PauseResume = new PauseResumeCommand(this);
+
       _searchManager = new SearchManager();
       _searchManager.SearchFinished += HandleSearchFinished;
       _searchManager.SearchResultUpdated += HandleSearchResultUpdated;
@@ -166,12 +173,6 @@ namespace CodeChallengeApp.ViewModel
       {
         _drives.Add(new Drive { Name = driveInfo.Name, IsSelected = false });
       }
-    }
-
-    private void Initialize()
-    {
-      this.Search = new SearchCommand(this);
-      this.PauseResume = new PauseResumeCommand(this);
     }
 
     private void HandleSearchFinished()
