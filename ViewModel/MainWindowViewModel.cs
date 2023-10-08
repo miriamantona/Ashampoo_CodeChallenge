@@ -73,6 +73,42 @@ namespace CodeChallenge.ViewModel
       }
     }
 
+    private bool _hasError;
+
+    public bool HasError
+    {
+      get
+      {
+        return _hasError;
+      }
+      set
+      {
+        if (_hasError != value)
+        {
+          _hasError = value;
+          RaisePropertyChangedEvent(nameof(HasError));
+        }
+      }
+    }
+
+    private string _errorMessage;
+
+    public string ErrorMessage
+    {
+      get
+      {
+        return _errorMessage;
+      }
+      set
+      {
+        if (_errorMessage != value)
+        {
+          _errorMessage = value;
+          RaisePropertyChangedEvent(nameof(ErrorMessage));
+        }
+      }
+    }
+
 
     public ICommand Search { get; set; }
     public ICommand PauseResume { get; set; }

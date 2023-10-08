@@ -41,6 +41,6 @@
     <TextBlock x:Name="textBoxSearching" Text="Searching..." FontSize="15"
            HorizontalAlignment="Left" VerticalAlignment="Top" Margin="255,31,0,0"
            Visibility="{Binding IsSearching, Converter={StaticResource BooleanToVisibilityConverter}}" />
-    <TextBlock x:Name="textErrorMessage" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="127,92,0,0" />
+    <TextBlock x:Name="textErrorMessage" Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}" Text="{Binding ErrorMessage}"  Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="127,92,0,0" />
   </Grid>
 </Window>
