@@ -1,14 +1,8 @@
-using CodeChallenge;
-using CodeChallenge.ViewModel;
+using CodeChallengeApp.Managers;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 
 namespace CodeChallengeApp.ViewModel.Commands
@@ -66,28 +60,17 @@ namespace CodeChallengeApp.ViewModel.Commands
         else
         {
           m_ViewModel.IsSearching = true;
+          m_ViewModel.IsSearchCompleted = false;
           m_ViewModel.HasError = false;
 
           List<Task> taskList = new();
 
           foreach (var drive in selectedDrives)
           {
-            Queue<string> queueDirectories = new Queue<string>();
-            queueDirectories.Enqueue(drive.Name);
-            m_ViewModel.SearchManager.AddQueue(queueDirectories);
-
-            taskList.Add(Task.Run(() => m_ViewModel.SearchManager.SearchAsync(queueDirectories)));
+            var directoriesQueue = new DirectoriesQueue(drive.Name);
+            m_ViewModel.SearchManager.AddQueue(directoriesQueue);
+            taskList.Add(Task.Run(() => m_ViewModel.SearchManager.SearchAsync(directoriesQueue)));
           }
-
-          Task.Run(() =>
-          {
-            while (m_ViewModel.SearchManager.HasDirectoriesToProcess)
-            {
-              m_ViewModel.IsSearching = true;
-              Thread.Sleep(100);
-            }
-            m_ViewModel.IsSearching = false;
-          });
         }
       }
       catch (Exception ex)

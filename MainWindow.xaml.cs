@@ -1,8 +1,8 @@
-using CodeChallenge;
-using CodeChallenge.Model;
-using CodeChallenge.ViewModel;
+using CodeChallengeApp.Model;
+using CodeChallengeApp.ViewModel;
 using System.Collections.Generic;
 using System.Linq;
+using CodeChallengeApp.Managers;
 
 namespace CodeChallengeApp
 {
@@ -32,6 +32,6 @@ namespace CodeChallengeApp
           }
         });
       }
-    }    
+    }
   }
 }

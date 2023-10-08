@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -9,10 +9,6 @@
 
   <ItemGroup>
     <None Remove="ViewModel\DriveListViewModel .cs~RFe36735.TMP" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Prism.Core" Version="8.1.97" />
   </ItemGroup>
 
 </Project>

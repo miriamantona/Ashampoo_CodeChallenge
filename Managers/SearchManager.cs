@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using CodeChallenge.Model;
+using CodeChallengeApp.Model;
 
-namespace CodeChallenge.Managers
+namespace CodeChallengeApp.Managers
 {
   public class SearchManager
   {
@@ -20,12 +20,12 @@ namespace CodeChallenge.Managers
 
     public CancellationTokenSource cancellationTokenSource;
 
-    private List<Queue<string>> queues = new List<Queue<string>>();
+    private List<DirectoriesQueue> queues = new List<DirectoriesQueue>();
 
 
     public bool HasDirectoriesToProcess
     {
-      get { return queues.Any(); }
+      get { return queues.Any(q => q.IsCompleted == false); }
     }
 
     public SearchManager()
@@ -34,26 +34,26 @@ namespace CodeChallenge.Managers
       cancellationTokenSource = new CancellationTokenSource();
     }
 
-    public void AddQueue(Queue<string> queue)
+    public void AddQueue(DirectoriesQueue queue)
     {
       queues.Add(queue);
     }
 
-    public async Task SearchAsync(Queue<string> queueDirectories)
+    public async Task SearchAsync(DirectoriesQueue directoriesQueue)
     {
-      if (queueDirectories == null)
+      if (directoriesQueue == null)
         return;
 
-      if (!queueDirectories.Any())
+      if (!directoriesQueue.Queue.Any())
         processedDirectories = new List<string>();
 
       List<DirectoryResult> results = new List<DirectoryResult>();
 
-      _ = Task.Run(async () =>
+      _ = Task.Run(() =>
       {
-        while (queueDirectories.Count > 0)
+        while (directoriesQueue.Queue.Count > 0)
         {
-          string currentDirectory = queueDirectories.Dequeue();
+          string currentDirectory = directoriesQueue.Queue.Dequeue();
 
           try
           {
@@ -67,12 +67,20 @@ namespace CodeChallenge.Managers
             string[] subDirectories = Directory.GetDirectories(currentDirectory);
             foreach (string subDirectory in subDirectories)
             {
-              queueDirectories.Enqueue(subDirectory);
+              directoriesQueue.Queue.Enqueue(subDirectory);
             }
           }
           catch (Exception ex)
           {
             Console.WriteLine($"Error al procesar el directorio {currentDirectory}: {ex.Message}");
+          }
+        }
+        if (!cancellationTokenSource.IsCancellationRequested)
+        {
+          directoriesQueue.IsCompleted = true;
+          if (!HasDirectoriesToProcess)
+          {
+            OnSearchFinished();
           }
         }
       });

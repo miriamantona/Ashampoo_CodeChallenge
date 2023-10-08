@@ -1,4 +1,4 @@
-namespace CodeChallenge.Model
+namespace CodeChallengeApp.Model
 {
   public class Drive
   {

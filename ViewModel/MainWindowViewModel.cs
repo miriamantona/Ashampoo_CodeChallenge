@@ -1,11 +1,12 @@
-using CodeChallenge.Model;
+using CodeChallengeApp.Managers;
+using CodeChallengeApp.Model;
 using CodeChallengeApp.Utilities;
 using CodeChallengeApp.ViewModel.Commands;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Input;
 
-namespace CodeChallenge.ViewModel
+namespace CodeChallengeApp.ViewModel
 {
   public class MainWindowViewModel : ViewModelBase
   {
@@ -39,6 +40,20 @@ namespace CodeChallenge.ViewModel
         {
           _isPaused = value;
           RaisePropertyChangedEvent(nameof(IsPaused));
+        }
+      }
+    }
+
+    private bool _isSearchCompleted;
+    public bool IsSearchCompleted
+    {
+      get { return _isSearchCompleted; }
+      set
+      {
+        if (_isSearchCompleted != value)
+        {
+          _isSearchCompleted = value;
+          RaisePropertyChangedEvent(nameof(IsSearchCompleted));
         }
       }
     }
@@ -140,6 +155,7 @@ namespace CodeChallenge.ViewModel
     private void HandleSearchFinished()
     {
       this.IsSearching = false;
+      this.IsSearchCompleted = true;
     }
   }
 }

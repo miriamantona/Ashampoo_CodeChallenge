@@ -1,4 +1,3 @@
-using CodeChallenge.ViewModel;
 using System;
 using System.Windows.Input;
 
