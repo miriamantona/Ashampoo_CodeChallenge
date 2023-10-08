@@ -10,33 +10,26 @@ namespace CodeChallengeApp.Managers
 {
   public class SearchManager
   {
-    private List<string> processedDirectories;
-
     public delegate void SearchResultUpdatedEventHandler(List<DirectoryResult> results);
     public event SearchResultUpdatedEventHandler SearchResultUpdated;
 
     public delegate void SearchFinishedEventHandler();
     public event SearchFinishedEventHandler SearchFinished;
 
-    public CancellationTokenSource cancellationTokenSource;
+    private CancellationTokenSource cancellationTokenSource;
 
     private List<DirectoriesQueue> queues = new List<DirectoriesQueue>();
+    private List<string> processedDirectories;
 
-
-    public bool HasDirectoriesToProcess
+    public void AddDirectoryQueue(DirectoriesQueue queue)
     {
-      get { return queues.Any(q => q.IsCompleted == false); }
+      queues.Add(queue);
     }
 
     public SearchManager()
     {
       processedDirectories = new List<string>();
       cancellationTokenSource = new CancellationTokenSource();
-    }
-
-    public void AddQueue(DirectoriesQueue queue)
-    {
-      queues.Add(queue);
     }
 
     public async Task SearchAsync(DirectoriesQueue directoriesQueue)
@@ -79,7 +72,7 @@ namespace CodeChallengeApp.Managers
         if (!cancellationTokenSource.IsCancellationRequested)
         {
           directoriesQueue.IsCompleted = true;
-          if (!HasDirectoriesToProcess)
+          if (!queues.Any(q => q.IsCompleted == false))
           {
             OnSearchFinished();
           }

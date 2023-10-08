@@ -54,7 +54,7 @@ namespace CodeChallengeApp.ViewModel.Commands
           foreach (var drive in selectedDrives)
           {
             var directoriesQueue = new DirectoriesQueue(drive.Name);
-            m_ViewModel.SearchManager.AddQueue(directoriesQueue);
+            m_ViewModel.SearchManager.AddDirectoryQueue(directoriesQueue);
             Task.Run(() => m_ViewModel.SearchManager.SearchAsync(directoriesQueue));
           }
         }
