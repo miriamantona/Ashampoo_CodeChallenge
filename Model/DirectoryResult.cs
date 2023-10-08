@@ -1,4 +1,4 @@
-namespace CodeChallenge
+namespace CodeChallenge.Model
 {
   public class DirectoryResult
   {

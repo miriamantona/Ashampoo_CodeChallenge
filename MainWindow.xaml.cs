@@ -1,4 +1,5 @@
 using CodeChallenge;
+using CodeChallenge.Model;
 using CodeChallenge.ViewModel;
 using System.Collections.Generic;
 using System.Linq;

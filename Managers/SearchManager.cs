@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CodeChallenge.Model;
 
-namespace CodeChallenge
+namespace CodeChallenge.Managers
 {
   public class SearchManager
   {
@@ -21,7 +21,7 @@ namespace CodeChallenge
     public CancellationTokenSource cancellationTokenSource;
 
     private List<Queue<string>> queues = new List<Queue<string>>();
-    
+
 
     public bool HasDirectoriesToProcess
     {
@@ -34,12 +34,12 @@ namespace CodeChallenge
       cancellationTokenSource = new CancellationTokenSource();
     }
 
-  public void AddQueue(Queue<string> queue)
-  {
-    this.queues.Add(queue);
-  }
+    public void AddQueue(Queue<string> queue)
+    {
+      queues.Add(queue);
+    }
 
-  public async Task SearchAsync(Queue<string> queueDirectories)
+    public async Task SearchAsync(Queue<string> queueDirectories)
     {
       if (queueDirectories == null)
         return;
@@ -49,7 +49,7 @@ namespace CodeChallenge
 
       List<DirectoryResult> results = new List<DirectoryResult>();
 
-      _ = Task.Run(async() =>
+      _ = Task.Run(async () =>
       {
         while (queueDirectories.Count > 0)
         {
@@ -74,7 +74,7 @@ namespace CodeChallenge
           {
             Console.WriteLine($"Error al procesar el directorio {currentDirectory}: {ex.Message}");
           }
-        }        
+        }
       });
     }
 
@@ -145,11 +145,6 @@ namespace CodeChallenge
           SearchAsync(queue);
         });
       }
-
-      /*if (queueDirectories.Any())
-        await SearchAsync(queueDirectories.Dequeue());
-      else
-        OnSearchFinished();*/
     }
 
     public void Pause()

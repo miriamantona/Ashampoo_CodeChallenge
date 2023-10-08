@@ -1,4 +1,4 @@
-using CodeChallengeApp;
+using CodeChallenge.Model;
 using CodeChallengeApp.Utilities;
 using CodeChallengeApp.ViewModel.Commands;
 using System.Collections.Generic;
