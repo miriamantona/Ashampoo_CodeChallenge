@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -6,6 +6,13 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Manager\**" />
+    <EmbeddedResource Remove="Manager\**" />
+    <None Remove="Manager\**" />
+    <Page Remove="Manager\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="ViewModel\DriveListViewModel .cs~RFe36735.TMP" />
