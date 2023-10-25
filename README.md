@@ -1,4 +1,4 @@
-# Readme - Ashampoo Code Challenge
+# Readme
 
 ## Introduction
 
@@ -9,23 +9,8 @@ of these files. The contents of sub-directories are not included in these number
 
 The app remains responsive at all times. Any changes in the data or the result list do not cause any flickering or disruptions to the layout.
 
-## Project structure
-
-- **MainWindow.xaml**: The main window of the application, implemented using XAML, provides the user interface for interacting with the application.
-
-- **MainWindow.xaml.cs**: Contains the logic and data binding necessary to connect the View with the underlying data and operations.
- 
-- **UIManager.cs**: Mediates between the UI and the SearchManager, managing user interactions and UI updates.
-
-- **SearchManager.cs**: The SearchManager class encapsulates the search functionality, including searching for directories, managing threads, and handling search results.
-
-### Threading
-
 The application uses asynchronous programming and multithreading to perform the search operation in parallel, ensuring responsiveness even during resource-intensive tasks.
 
-### Error Handling
-
-The application handles exceptions gracefully and provides user-friendly error messages in case of any issues during the search process.
 
 ## Getting Started
 
